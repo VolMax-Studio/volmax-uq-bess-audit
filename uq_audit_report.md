@@ -16,7 +16,7 @@ To address this, we wrap the baseline model using **Conformal Prediction**—spe
 
 ---
 
-## 1. Finding: The Illusion of Certainty (Point-Estimate Failure)
+## 1. Finding: Point-Estimate Accuracy Degradation Under OOD Shift
 The baseline point-prediction model achieves a root mean squared error (RMSE) of **172.49 cycles** on the in-distribution validation split. However, under the OOD stress-test (Secondary Batch), its RMSE increases by **35% to 233.02 cycles**. 
 
 A deterministic model offers no indicator of this accuracy degradation. It predicts a single, "certain" cycle life value for every cell, leaving the BESS control loop blind to model errors.
@@ -46,7 +46,7 @@ Evaluating both wrappers yields the following metrics:
 | **Winkler Score** | — | 959.39 | — | 1525.48 |
 
 ### Rigorous Calibration Analysis (GATE-UQ):
-1. **The Finite Sample Conservatism:** On the In-Distribution Calibration set, both wrappers exhibit a **100% empirical coverage (PICP)**. This is not a hyperparameter tuning success; it is a limitation of the small calibration sample size ($n_{cal} = 17$). For $\alpha = 0.10$, the conformal quantile index is computed as $\lceil (17 + 1)(0.90) \rceil = 17$, forcing the estimator to take the absolute maximum residual of the entire calibration set. This yields highly conservative, bloated prediction intervals.
+1. **The Finite Sample Conservatism:** On the In-Distribution Calibration set, both wrappers exhibit a **100% empirical coverage (PICP)**. This is not a hyperparameter tuning success; it is a limitation of the small calibration sample size ($n_{cal} = 17$). For $\alpha = 0.10$, the conformal quantile index is computed as $\lceil (17 + 1)(0.90) \rceil = 17$, forcing the estimator to take the absolute maximum residual of the entire calibration set. This yields highly conservative, bloated prediction intervals. While the small calibration set size ($n_{cal}=17$) exacerbates this over-conservatism, the fundamental breakdown of conformal prediction under OOD shift is driven by the violation of the exchangeability assumption. Even with a larger calibration dataset, the loss of exchangeability guarantees means that empirical coverage is no longer mathematically bound to the nominal confidence level under distribution shift, resulting in either uncalibrated coverage drops or bloated interval widths.
 2. **Bloated Intervals under OOD Shift:** Under the OOD stress-test (Secondary Batch), empirical coverage remains extremely high (97.50% for Standard, 100.00% for Adaptive). However, inspecting the **Mean Prediction Interval Width (MPIW)** reveals the cost: standard intervals expand to **935.76 cycles**, while adaptive intervals balloon to **1525.48 cycles** (which is wider than the entire average lifespan of the batteries). 
 3. **Verdict on Conformal UQ:** While conformal prediction bounds the actual degradation mathematically, the resulting intervals under distribution shift are so bloated that they provide little operational utility for cell replacement scheduling or market dispatch optimization.
 
@@ -64,7 +64,7 @@ To complement the conformal intervals, we integrate a **Hybrid OOD Detector** co
 1. **Ill-Conditioned Covariance Artifact:** Our initial analysis reported an extreme Mahalanobis distance peaking at **1840.41**. Independent verification revealed this was a **numerical artifact** caused by an ill-conditioned empirical covariance matrix, which inversion scaled dramatically due to the high collinearity of early-cycle battery features (e.g., $\Delta Q(V)$ variance vs. minimum).
 2. **Ledoit-Wolf Regularization:** Switching to a regularized **Ledoit-Wolf covariance estimator** resolves the ill-conditioning. The corrected Mahalanobis distances are statistically sound: Train mean is **3.93** (expected for $df=5$), and OOD mean is **4.35**.
 3. **Specific Outlier Identification:**
-   * **Cell `b3c42` (OOD Outlier):** Corrected Mahalanobis $d^2 = 32.46$. This cell experienced an early-cycle voltage/capacity drift where the raw feature `log_min_dq` was $-2.25$ (a massive $-4.75$ standard deviations away from the train average). Despite this early feature anomaly, its true cycle life was relatively high (1642 cycles), causing the baseline SOH model to overestimate its degradation.
+   * **Cell `b3c42` (OOD Outlier):** Corrected Mahalanobis $d^2 = 32.46$. This cell experienced an early-cycle voltage/capacity drift where the raw feature `log_min_dq` was $-2.25$, representing a deviation of $-4.75$ standard deviations from the training mean of this feature (corresponding to a scaled feature value of $-4.75$). Despite this early feature anomaly, its true cycle life was relatively high (1642 cycles), causing the baseline SOH model to overestimate its degradation.
    * **Cell `b1c18` (Cal Outlier):** Mahalanobis $d^2 = 164.24$. This in-distribution cell had a premature degradation path, failing early at 691 cycles, which skewed the early capacity fade features.
 4. **The Necessity of Conformal UQ:** Out of 40 OOD cells in the Secondary Batch, the hybrid detector flags only **2 cells** (5.00% flag rate). Since 95% of OOD cells hide within the nominal feature space envelope, feature-space anomaly detection alone is blind to the shift, making predictive uncertainty quantification (conformal bounding) necessary.
 
@@ -92,7 +92,7 @@ The reliability diagram shows observed coverage versus nominal confidence levels
 ---
 
 ## 6. Business Impact & Cost of Uncertainty
-Operating a BESS with an uncalibrated, overconfident SOH model introduces severe financial and operational risks:
+Operating a BESS with an uncalibrated, overconfident SOH model introduces economic and operational risks:
 1. **Unhedged Warranty Claims:** A deterministic SOH model that misses the true degradation by $233$ cycles (as seen in our OOD test) can cause operators to overshoot safe throughput limits, risking premature capacity degradation that voids manufacturer performance warranties.
 2. **Suboptimal Dispatch Decision-making:** BESS dispatch models optimize bids in daily electricity markets based on predicted degradation costs. If the SOH estimate is overconfident, the bidding optimizer underpricing degradation leads to unprofitable bids and accelerated battery wear.
 3. **Suboptimal Replacement Planning & Project Economics:** Scheduling pack replacements too late due to overconfident point predictions results in unexpected system downtime and lost arbitrage revenue. Overconfident predictions also undermine project bankability, as debt providers require audited, statistically sound state estimates to verify long-term capacity projections.
