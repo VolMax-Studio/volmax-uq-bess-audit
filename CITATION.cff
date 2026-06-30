@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: "Nestorov"
+    given-names: "Ivan"
+    orcid: "https://orcid.org/0009-0006-7940-9539"
+title: "VolMax Battery SOH Uncertainty Quantification (UQ) Audit: Conformal Prediction and Hybrid Out-of-Distribution Diagnostics"
+version: "1.0.0"
+doi: "10.5281/zenodo.21084102"
+date-released: 2026-06-30
+url: "https://github.com/VolMax-Studio/volmax-uq-bess-audit"
+license: MIT

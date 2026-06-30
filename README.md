@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21084102.svg)](https://doi.org/10.5281/zenodo.21084102)
 # Battery SOH Uncertainty Quantification (UQ) Audit
 
 This repository contains the code, data loader, and results for an independent Uncertainty Quantification (UQ) audit of a State of Health (SOH) machine learning predictor. 

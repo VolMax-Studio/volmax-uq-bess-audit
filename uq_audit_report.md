@@ -1,4 +1,5 @@
 # Independent UQ Verification Report: SOH Early-Prediction ML Model
+**DOI:** [10.5281/zenodo.21084102](https://doi.org/10.5281/zenodo.21084102)  
 **Date:** June 30, 2026  
 **Auditor:** VolMax Studio (Independent Verification Service)  
 **Verification Method:** P10 Protocol (Uncertainty Quantification Calibration)  
