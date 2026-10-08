@@ -1,0 +1,25 @@
+{
+  "baseline_commit": "b6e61849795d542a98681097fd20d42f103a85d9",
+  "baseline_tree": "08f9db7c178089e8cd249d31d2c9ff99363c0949",
+  "behavior": {
+    "callbacks": false,
+    "executable": false,
+    "network_calls": false,
+    "telemetry": false
+  },
+  "canonical_url": "https://github.com/VolMax-Studio/volmax-uq-bess-audit",
+  "default_branch_at_recording": "main",
+  "license": {
+    "detected_spdx": null,
+    "files": [],
+    "note": "This provenance record does not grant or alter license rights."
+  },
+  "owner": "VolMax-Studio",
+  "record_id": "urn:volmax:github:VolMax-Studio/volmax-uq-bess-audit:b6e61849795d542a98681097fd20d42f103a85d9",
+  "record_type": "volmax.repository-provenance",
+  "record_version": 1,
+  "recorded_at": "2026-10-08T19:43:35+00:00",
+  "repository": "VolMax-Studio/volmax-uq-bess-audit",
+  "schema": "urn:volmax:provenance:v1",
+  "scope": "Repository identity and baseline commit only; historical tags, releases, evidence, authorship, and existing file bytes are unchanged."
+}
